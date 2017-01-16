@@ -1,0 +1,6 @@
+# This file is managed by Saltstack at {{ source }}
+# DO NOT EDIT
+
+{%- for key in config %}
+{{ key }}={{ config[key] }}
+{% endfor %}
