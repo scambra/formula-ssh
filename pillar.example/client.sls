@@ -1,7 +1,11 @@
 ssh:
-
   client:
 
+
+    # Send all managed ssh public keys by default to the salt mine
+    mine_pub_key_default: True
+
+    # Setup /etc/ssh/ssh_config, the default ~/.ssh/config for all users
     config:
       'Host *':
         SendEnv: 'LANG LC_*'
@@ -9,12 +13,18 @@ ssh:
         GSSAPIAuthentication: 'yes'
         GSSAPIDelegateCredentials: 'no'
 
+
+    # Manage ssh setups for Linux users
     users:
 
       root:
         # Generate a SSH keypair (which is the default if not given)
         # The public key will be mined
         keypair: generate
+
+        # If you do not want to mine the ssh public key for this user, set this to False
+        # True or False, default: True
+        mine_keypair: False
 
         environment:
           SOME: VARIABLE
@@ -38,7 +48,7 @@ ssh:
               state: present
 
           # From the mined public keys
-          mine:
+          mined:
             peter:
               # Matches the last part of the key
               match: 'backuppc@backup.example.com'
@@ -48,13 +58,12 @@ ssh:
 
         # Populate known_hosts
         known_hosts:
-          # From pillars by ssh connecting to hosts and accepting the keys
-          pillar:
-            # present or absent
-            github.com: present
-          # From the mined public keys
-          mine:
-            web.tinc.example.com: present
+          # This will attempt to attemt to ssh to the host
+          # This could also be done with the mine - however this much simpler version can be used in all cases
+          # If you cant ssh to a host - you dont need to set up ssh for it :)
+          # present or absent
+          github.com: present
+          git.example.com: absent
 
 
 
