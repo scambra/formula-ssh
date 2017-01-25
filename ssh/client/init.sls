@@ -21,7 +21,7 @@ ssh_client_/etc/ssh/ssh_config:
 {% for user in ssh['client'].get('users', {}) %}
 
     {% set user_home = salt['user.info'](user).get('home', '/home/' + user) %}
-    {% set user_primary_group = salt['cmd.run']('/usr/bin/id -g -n ' + user) %}
+    {% set user_primary_group = salt['cmd.run']('/usr/bin/id -g -n ' + user + ' 2>/dev/null || echo ' + user) %}
 
 # Manage the presence of the ~/.ssh directory
 ssh_client_directory_{{ user }}:
@@ -87,13 +87,19 @@ ssh_client_keypair_{{ user }}_pillar_{{ key_file_type }}:
     {% if ssh['client']['users'][user].get('mine_keypair', mine_pub_key_default) %}
 
 # Push the users public key to the mine
+# TODO This does not let one set the actual mine ID of the object. In this case, it would be "cmd.run"
+# https://github.com/saltstack/salt/issues/38800
+#ssh_client_keypair_{{ user }}_mine_pubkey:
+# module.run:
+#    - name: ssh_pub_{{ user }}@{{ grains['id'] }}
+#    - alias: ssh_pub_{{ user }}@{{ grains['id'] }}
+#    - func: cmd.run
+#    - kwargs:
+#        cmd: cat {{ user_home }}/.ssh/id_rsa.pub
+# So cmd.run is used here until this is figured out
 ssh_client_keypair_{{ user }}_mine_pubkey:
- module.run:
-    - name: mine.send
-    - alias: ssh_pub_{{ user }}@{{ grains['id'] }}
-    - func: cmd.run
-    - kwargs:
-        cmd: cat {{ user_home }}/.ssh/id_rsa.pub
+  cmd.run:
+    - name: 'salt-call mine.send "ssh_pub_{{ user }}@{{ grains['id'] }}" mine_function=cmd.run "cat {{ user_home }}/.ssh/id_rsa.pub" 2>/dev/null'
 
     {% else %}
 
@@ -174,9 +180,13 @@ ssh_client_authorized_keys_mined_{{ user }}_authorize_{{ mined_authorized_user }
             {% else %}
 
 ssh_client_authorized_keys_mined_{{ user }}_authorize_{{ mined_authorized_user }}_NOT_FOUND_IN_MINE_FOR_{{ grains['id'] }}:
+# Sadly, if I do this, the state will not fail ;) ...
+#  module.run:
+#    - name: mine.get
+#    - tgt: {{ grains['id'] }}
+#    - m_fun: ssh_pub_{{ mined_public_key_match }}
   cmd.run:
-    - name: salt '{{ grains['id'] }}' mine.get '{{ grains['id'] }}' 'ssh_pub_{{ mined_public_key_match }}'; /bin/false
-# TODO make this module.run mine.get
+    - name: 'salt-call mine.get "{{ grains['id'] }}" "ssh_pub_{{ mined_public_key_match }}" 2>/dev/null; echo PUBLIC KEY NOT FOUND; /bin/false'
 
             {% endif %}
 
