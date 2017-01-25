@@ -186,7 +186,7 @@ ssh_client_authorized_keys_mined_{{ user }}_authorize_{{ mined_authorized_user }
 #    - tgt: {{ grains['id'] }}
 #    - m_fun: ssh_pub_{{ mined_public_key_match }}
   cmd.run:
-    - name: 'salt-call mine.get "{{ grains['id'] }}" "ssh_pub_{{ mined_public_key_match }}" 2>/dev/null; echo PUBLIC KEY NOT FOUND; /bin/false'
+    - name: 'salt-call mine.get "{{ grains['id'] }}" "ssh_pub_{{ mined_public_key_match }}" 2>/dev/null; echo "PUBLIC KEY \"{{ mined_authorized_user }}\" WITH ID \"{{ mined_public_key_match }}\" NOT FOUND IN MINE"; /bin/false'
 
             {% endif %}
 
