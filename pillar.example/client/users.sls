@@ -4,6 +4,14 @@ ssh:
     # Send all managed ssh public keys to the salt mine by default? (overridable below)
     mine_pub_key_default: True
 
+    # ssh-keygen arguments - omit -f { user_home }, as this is set by the formula
+    ssh_keygen_arguments: "-q -N '' -o -a 128 -t ed25519"
+
+    # Filename-base of the keypair files generated with the { ssh_keygen_arguments } specified above
+    # The example above will generate a `~/.ssh/id_ed25519.pub` file, hence we specify "id_ed25519"
+    ssh_keygen_filename: id_ed25519
+
+
     # Manage ssh setups for Linux users
     users:
 
@@ -15,7 +23,7 @@ ssh:
 
         # If you do not want to mine the ssh public key for this user, set this to False
         # True or False, default: True
-        mine_keypair: False
+        mine_keypair: True
 
         # Setup key=value environment variables in ~/.ssh/environment
         environment:
@@ -35,12 +43,12 @@ ssh:
           pillar:
             # A generic name for this dictionary
             peter:
-              key: 'command="/usr/bin/echo foobar" ssh-rsa ABCDEFG peter@example.com'
+              key: 'command="/usr/bin/echo foobar" ssh-rsa kdsfsakfsajkfsjfk peter@example.com'
               # present or absent, default: present
               state: present
           # From the mined public keys
           mined:
-            peter:
+            backuppc:
               # Matches the last part of the key
               match: 'backuppc@backup.example.com'
               # prepend something to the public key
@@ -56,8 +64,6 @@ ssh:
           git.example.com: absent
 
 
-
-{#
       # Another user
       backuppc:
         # If keypair is not defined or keypair != generate
@@ -67,4 +73,4 @@ ssh:
           'id_rsa': |
             -----BEGIN RSA PRIVATE KEY-----
             -----END RSA PRIVATE KEY-----
-#}
+
