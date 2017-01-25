@@ -1,31 +1,23 @@
 ssh:
   client:
 
-
-    # Send all managed ssh public keys by default to the salt mine
+    # Send all managed ssh public keys to the salt mine by default? (overridable below)
     mine_pub_key_default: True
-
-    # Setup /etc/ssh/ssh_config, the default ~/.ssh/config for all users
-    config:
-      'Host *':
-        SendEnv: 'LANG LC_*'
-        HashKnownHosts: 'yes'
-        GSSAPIAuthentication: 'yes'
-        GSSAPIDelegateCredentials: 'no'
-
 
     # Manage ssh setups for Linux users
     users:
 
+      # Manage the "root" user
       root:
+
         # Generate a SSH keypair (which is the default if not given)
-        # The public key will be mined
         keypair: generate
 
         # If you do not want to mine the ssh public key for this user, set this to False
         # True or False, default: True
         mine_keypair: False
 
+        # Setup key=value environment variables in ~/.ssh/environment
         environment:
           SOME: VARIABLE
 
@@ -34,7 +26,7 @@ ssh:
           'sat.github.com':
             HostName: 'github.com'
             User: git
-            IdentityFile: ~/.ssh/id_ed25519_sat
+            IdentityFile: '~/.ssh/id_ed25519_sat'
             IdentitiesOnly: 'yes'
 
         # Populate authorized_keys
@@ -46,7 +38,6 @@ ssh:
               key: 'command="/usr/bin/echo foobar" ssh-rsa ABCDEFG peter@example.com'
               # present or absent, default: present
               state: present
-
           # From the mined public keys
           mined:
             peter:
@@ -54,7 +45,6 @@ ssh:
               match: 'backuppc@backup.example.com'
               # prepend something to the public key
               prepend: 'command="/usr/bin/echo foobar"'
-              
 
         # Populate known_hosts
         known_hosts:
@@ -67,14 +57,14 @@ ssh:
 
 
 
+{#
+      # Another user
       backuppc:
         # If keypair is not defined or keypair != generate
-        # The public key will also be mined!
+        # This public key will also be mined if mine_keypair != False
         keypair:
           'id_rsa.pub': 'ssh-rsa asdfasdfsadf backuppc@backup.example.com'
           'id_rsa': |
             -----BEGIN RSA PRIVATE KEY-----
             -----END RSA PRIVATE KEY-----
-
-        
-        
+#}
