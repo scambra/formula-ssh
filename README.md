@@ -2,7 +2,7 @@
 
 Manage installations of the openssh server and client. Mine ssh public keys and configure them on specified minions.
 
-## PENDING ISSUES
+## PENDING ISSUES @ [github.com/saltstack/salt](https://github.com/saltstack/salt)
 
 - Fatal: Using `ssh_auth.present` fails in salt 2016.11.0: [github issue](https://github.com/saltstack/salt/issues/38930)
 - Annoying: Using mine.send via module.run does not accept to set a mine ID for the send object: [github issue](https://github.com/saltstack/salt/issues/38800)
