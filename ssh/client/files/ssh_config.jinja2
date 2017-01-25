@@ -3,7 +3,7 @@
 
 {%- for host in config %}
 {{ host }}
-{%- for key in config[host] %}
+{%- for key in config[host] | sort %}
     {{ key }} {{ config[host][key] }}
 {%- endfor %}
 {% endfor %}

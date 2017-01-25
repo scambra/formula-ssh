@@ -3,7 +3,7 @@
 
 {% for key in config | sort %}
 {%- if config[key] is list %}
-{%- for item in config[key] %}
+{%- for item in config[key] | sort %}
 {{ key }} {{ item }}
 {%- endfor %}
 {%- else %}
