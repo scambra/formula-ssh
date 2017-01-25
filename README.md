@@ -1,6 +1,6 @@
 # OpenSSH Saltstack Formula
 
-Manage installations of the openssh server and client. Mine generated public keys and make them available to specific minions.
+Manage installations of the openssh server and client. Mine ssh public keys and configure them on specified minions.
 
 
 ## Features
@@ -21,16 +21,17 @@ Manage installations of the openssh server and client. Mine generated public key
 - Manage `/etc/ssh/sshd_config`
 - Manage `/etc/default/ssh`
 
-There are more configurable files per client / server, see <https://en.wikibooks.org/wiki/OpenSSH/Client_Configuration_Files#.2Fetc.2Fssh.2Fssh_known_hosts>
+There are more configurable files per client / server, see:  
+<https://en.wikibooks.org/wiki/OpenSSH/Client_Configuration_Files#.2Fetc.2Fssh.2Fssh_known_hosts>  
 However we dont see a reason to manage all of them. We dont use `/etc/ssh/rc`, if the usecase arises, we will add it.
 
 
 ## Formula Usage
 
-**Setup pillar**
+**Setup pillar**  
 Copy the `pillar.example` directory from this git repository to `/srv/pillar/ssh` and put define it in `/srv/pillar/top.sls`
 
-**Configure mine**
+**Configure mine**  
 Configure the mine according to your likings. This formula only sends SSH public keys to the mine, the IDs are named: `ssh_pub_{{ user }}@{{ grains['id'] }}`  
 As the pillars allow to define which public keys are actually setup in the authorized_keys files, its ok to give all minions access to all public keys via the mine. Edit `/etc/salt/master.d/mine.conf` and insert the following:
 ```
@@ -41,7 +42,7 @@ mine_get:
     - ssh_pub_*
 ```
 
-**Apply the formula**
+**Apply the formula**  
 To apply the configuration defined in `/srv/pillar/ssh/`, run:
 ```
 salt 'minion' state.sls ssh
