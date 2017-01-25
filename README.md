@@ -52,8 +52,9 @@ salt 'minion' state.sls ssh
 
 This formula requires Linux users, whos client configuration is to be managed, to be present. The [group-and-user](https://github.com/blunix/formula-group-and-user) formula can be used to accomplish this. 
 
-If ssh keys from the SaltStack mine are defined, those have to generated / templated and mined first. If you want to setup a ssh keypair for the user "backuppc" on the machine "backup.example.com", run
-the formula on the "backuppc.example.com" minion first. 
+If ssh keys from the SaltStack mine are defined, those have to generated / templated and mined first. An example for a backup server running [backuppc](https://github.com/blunix/formula-backuppc):  
+- Configure the pillars to generate a keypair on the machine "backuppc.example.com" for the user "backuppc" and have it pushed to the mine, then run the formula on the "backuppc" machine.
+- Setup the public key "backuppc@backup.example.com" in the pillars for the root user for all other minions, then run the formula on all minions.
 
 
 ## Testing in Vagrant
