@@ -173,30 +173,33 @@ ssh_client_authorized_keys_pillar_{{ user }}_authorize_{{ authorized_user }}:
             # We have the information "user@host" which we can match against. This will hence match on only one specific minion.
             # As public keys are public ;) its ok to have all minions have access to ssh_pub_* in /etc/salt/master.
             # The pillar data then decieds which keys are actually set up.
-            {% set matched_public_key = None %}
+            # matched_public_key doesnt have to be a list, but i dont get how to create a jinja do statement to update a string
+            {% set matched_public_key = [] %}
             {% for mined_member_host, mined_member_pub_key in salt['mine.get']('*', 'ssh_pub_' + mined_public_key_match).items() %}
-                {% set matched_public_key = mined_member_pub_key %}
+                {% do matched_public_key.append(mined_member_pub_key) %}
             {% endfor %}
 
-            {% if matched_public_key != None %}
+            # As we request a specific mine item, this list can only contain one item. If it does, ithis can only match one specific key
+            {% if matched_public_key != [] %}
 
 # Manage $HOME/.ssh/authorized_keys from mine data
-ssh_client_authorized_keys_mined_{{ user }}_authorize_{{ mined_authorized_user }}:
+ssh_client_authorized_keys_mined_{{ user }}_authorize_{{ mined_authorized_user }}_id_{{ mined_public_key_match }}:
   ssh_auth.{{ mined_public_key_state }}:
-    - name: {{ matched_public_key }}
+    # TODO using the first item in the list is hacky, how to make matched_public_key a string?
+    - name: {{ matched_public_key[0] }}
     - user: {{ user }}
     - config: {{ user_home }}/.ssh/authorized_keys
 
             {% else %}
 
-ssh_client_authorized_keys_mined_{{ user }}_authorize_{{ mined_authorized_user }}_NOT_FOUND_IN_MINE_FOR_{{ grains['id'] }}:
+ssh_client_authorized_keys_mined_{{ user }}_authorize_{{ mined_authorized_user }}_ID_{{ mined_public_key_match }}_NOT_FOUND_IN_MINE:
 # Sadly, if I do this, the state will not fail ;) ...
 #  module.run:
 #    - name: mine.get
 #    - tgt: {{ grains['id'] }}
 #    - m_fun: ssh_pub_{{ mined_public_key_match }}
   cmd.run:
-    - name: 'salt-call mine.get "{{ grains['id'] }}" "ssh_pub_{{ mined_public_key_match }}" 2>/dev/null; echo "PUBLIC KEY \"{{ mined_authorized_user }}\" WITH ID \"{{ mined_public_key_match }}\" NOT FOUND IN MINE"; /bin/false'
+    - name: 'salt-call mine.get "*" "ssh_pub_{{ mined_public_key_match }}" 2>/dev/null; echo "{{ matched_public_key }}"; /bin/false'
 
             {% endif %}
 
