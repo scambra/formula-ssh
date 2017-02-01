@@ -26,7 +26,6 @@ ssh:
       RhostsRSAAuthentication: 'no'
       RSAAuthentication: 'yes'
       ServerKeyBits: 1024
-      SSHD_OPTS: ''
       StrictModes: 'yes'
       'Subsystem sftp': /usr/lib/openssh/sftp-server
       SyslogFacility: AUTH
