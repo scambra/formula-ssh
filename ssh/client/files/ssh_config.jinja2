@@ -4,6 +4,12 @@
 {%- for host in config %}
 {{ host }}
 {%- for key in config[host] | sort %}
+{%- if config[host][key] is list %}
+{%- for item in config[host][key] | sort %}
+    {{ key }} {{ item }}
+{%- endfor %}
+{%- else %}
     {{ key }} {{ config[host][key] }}
+{%- endif %}
 {%- endfor %}
 {% endfor %}
