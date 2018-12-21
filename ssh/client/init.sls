@@ -21,7 +21,7 @@ ssh_client_/etc/ssh/ssh_config:
 {% for user in ssh['client'].get('users', {}) %}
 
     {% set user_home = salt['user.info'](user).get('home', '/home/' + user) %}
-    {% set user_primary_group = salt['cmd.run']('/usr/bin/id -g -n ' + user + ' 2>/dev/null || echo ' + user) %}
+    {% set user_primary_group = salt['cmd.run']('/usr/bin/id -g -n ' + user) if salt['user.info'](user) else user %}
 
 # Manage the presence of the ~/.ssh directory
 ssh_client_directory_{{ user }}:
