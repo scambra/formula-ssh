@@ -32,3 +32,7 @@ ssh_server_/etc/default/ssh:
 ssh_server_service:
   service.running:
     - name: ssh
+    - reload: True
+  watch:
+    file: ssh_server_sshd_config
+    file: ssh_server_/etc/default/ssh
